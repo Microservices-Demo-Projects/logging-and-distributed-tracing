@@ -1,0 +1,35 @@
+server:
+  port: 8084
+  servlet:
+    context-path: /four
+
+spring:
+  application:
+    # The spring.application.name property is required.
+    # Spring uses the application name as the service name
+    # for OTEL reporting and logging.
+    name: ${POD_NAME:demo-ms-four}
+
+management:
+  tracing:
+    sampling:
+      # By default, spring sets the sampling rate to 0.1 (i.e., 10%)
+      # to reduce the data collected and reported out of the microservice.
+      # When a trace/span is not sampled, it adds no overhead (a noop).
+      # The value 1.0 (i.e., 100%) means all the spans will be exported.
+      probability: 1.0
+
+logging:
+  level:
+    org.springframework: INFO
+    com.example.demo.ms: TRACE
+
+client:
+  base-url:
+    demo-ms-three: http://localhost:8083/three
+
+
+jaeger:
+  collector:
+    # This is gRPC protocol endpoint for OTEL Collector
+    url: http://localhost:4317/api/traces

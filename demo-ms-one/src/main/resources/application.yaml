@@ -1,0 +1,32 @@
+server:
+  port: 8081
+  servlet:
+    context-path: /one
+
+spring:
+  application:
+    # The spring.application.name property is required.
+    # Spring uses the application name as the service name
+    # for OTEL reporting and logging.
+    name: ${POD_NAME:demo-ms-one}
+
+management:
+  tracing:
+    sampling:
+      # By default, spring sets the sampling rate to 0.1 (i.e., 10%)
+      # to reduce the data collected and reported out of the microservice.
+      # When a trace/span is not sampled, it adds no overhead (a noop).
+      # The value 1.0 (i.e., 100%) means all the spans will be exported.
+      probability: 1.0
+  otlp:
+    tracing:
+      # The default HTTP protocol endpoint for OTEL Collector
+      endpoint: ${JAEGER_COLLECTOR_URL:http://localhost:4318/v1/traces}
+
+
+logging:
+  level:
+    org.springframework: INFO
+    com.example.demo.ms: TRACE
+
+

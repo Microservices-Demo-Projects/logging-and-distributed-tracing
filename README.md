@@ -24,6 +24,7 @@ This is a proof of concept project demonstrating logging with traceIds and spanI
 # Configuring Other Dependencies
 
 - Include the following BOMs in the `pom.xml` files of all four demo projects so that we can get the other dependencies corresponding to the BOMs that are required and compatible without mentioning the specific dependency versions everywhere.
+
     ```XML
     <dependencyManagement>
         <dependencies>
@@ -47,6 +48,7 @@ This is a proof of concept project demonstrating logging with traceIds and spanI
 
 - Next, add the following dependencies in the `pom.xml` files of all four demo projects for traceId/spanId generation, propagation, and instrumentation.
 	- The `micrometer-tracing-bridge-otel` dependency provides a micrometer bridge/facade to OpenTelemetry tracing. It also transitively pulls all the required OpenTelemetry SDKs required for the span tracing, propagation, and instrumentation(setup/config).
+
 	     ```XML
 		    <dependency>
 		 	<groupId>io.micrometer</groupId>
@@ -55,6 +57,7 @@ This is a proof of concept project demonstrating logging with traceIds and spanI
 	    ```
 
 	- The `opentelemetry-exporter-otlp` dependency provides the logic for exporting/reporting to any OpenTelemetry protocol (OTLP) compliant log collector (in the demo we are using Jaeger).
+
 	     ```XML
 		    <dependency>
 		 	<groupId>io.opentelemetry</groupId>
@@ -69,6 +72,7 @@ This is a proof of concept project demonstrating logging with traceIds and spanI
 # Log Sampling Configuration
 - By default, springboot sets the sampling rate to `0.1` (i.e., 10%) to reduce the log data collected and reported to the OTLP log collector (e.g., Jaeger). When a span is not sampled, it adds no overhead (a noop).
 - For this demo application we will use the sampling rate as `1.0` (i.e., 100%) so that all the spans will be exported to OTLP log collector (e.g., Jaeger) as follows in the `application.yaml`:
+
     ```YAML
     management:
         tracing:
@@ -80,16 +84,68 @@ This is a proof of concept project demonstrating logging with traceIds and spanI
 
 ## `HTTP` Log Exporter Configuration
 - By default, the springboot apps are configured to use the HTTP based log exporter with OTLP log collectors. Therefore, we have to just include the following in `application.yaml`:
+
     ```YAML
     management:
         otlp:
             tracing:
-                endpoint: ${JAEGER_COLLECTOR_URL:http://jaeger:4318/v1/traces}
+                # The default HTTP protocol endpoint for OTEL Collector
+                endpoint: ${JAEGER_COLLECTOR_URL:http://localhost:4318/v1/traces}
     ```
 
 ## `gRPC` Log Exporter Configuration
 
 - To Do...(Application properties and @Configuration class details)
+- Instead of the `HTTP` based log exporter property `management.otlp.tracing.endpoint` from spring, we will create a custom property for `gRPC` based log exporter endpoint as follows in the `application.yaml`:
+
+    ```YAML
+    otel:
+        collector:
+            # This is gRPC protocol endpoint for OTEL Collector
+            url: http://localhost:4317/api/traces
+    ```
+- Then, we have to create a custom `@Configuration` class as follows:
+
+    ```java
+    package com.example.demo.ms.three.configs;
+
+    import io.opentelemetry.context.propagation.TextMapPropagator;
+    import io.opentelemetry.exporter.otlp.trace.OtlpGrpcSpanExporter;
+    import io.opentelemetry.extension.trace.propagation.JaegerPropagator;
+    import org.springframework.beans.factory.annotation.Value;
+    import org.springframework.context.annotation.Bean;
+    import org.springframework.context.annotation.Configuration;
+    import org.springframework.http.HttpHeaders;
+
+    @Configuration
+    public class OtelConfiguration {
+
+        private final String otelCollectorUrl;
+
+        public OtelConfiguration(@Value("${otel.collector.url") String otelCollectorUrl) {
+            this.otelCollectorUrl = otelCollectorUrl;
+        }
+
+        @Bean
+        public TextMapPropagator jaegerPropagator() {
+            return JaegerPropagator.getInstance();
+        }
+
+        /**
+        * This custom bean definition method is required if we want to use gRPC (typical port 4317)
+        * instead of the default HTTP protocol (typically on port 4318) for exporting the span.
+        * By default, the Spring's OtlpAutoConfiguration class will setup the OtlpHttpSpanExporter bean.
+        * @return OtlpGrpcSpanExporter
+        */
+        @Bean
+        public OtlpGrpcSpanExporter grpcSpanExporter(){
+            return OtlpGrpcSpanExporter.builder()
+                    .addHeader(HttpHeaders.CONTENT_TYPE, "application/x-protobuf")
+                    .setEndpoint(otelCollectorUrl)
+                    .build();
+        }
+    }
+    ```
 
 # Containerizing the Application
 - The four demo apps are using spring boot, maven and Java 21 therefore we will create a two stage dockerfile as follows to containerize the demo apps.
@@ -252,3 +308,9 @@ This is a proof of concept project demonstrating logging with traceIds and spanI
             ```
 
 - To Do...(Docker Compose and Kubernetes (ServiceMesh) Manifest)
+
+
+# References:
+- **[Common Springboot Application Properties
+](https://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/html/application-properties.html)**
+    - For example refer: `management.otlp.tracing.*` properties.
