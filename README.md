@@ -23,8 +23,8 @@ This is a proof of concept project demonstrating logging with traceIds and spanI
 
 # Configuring Other Dependencies
 
-- Include the following BOMs in the `pom.xml` files of all the four demo projects so that we can get the other dependencies corresponding to the BOMs that are required and compatible without mentioning the specific dependency versions everywhere.
-    ```xml
+- Include the following BOMs in the `pom.xml` files of all four demo projects so that we can get the other dependencies corresponding to the BOMs that are required and compatible without mentioning the specific dependency versions everywhere.
+    ```XML
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -45,29 +45,26 @@ This is a proof of concept project demonstrating logging with traceIds and spanI
     </dependencyManagement>
     ```
 
-- Next, add the following dependencies in the `pom.xml` files of all the four demo projects for traceId/spanId generation, propagation and instrumentation.
-    ```xml
-        <!--This dependency provides micrometer bridge/facade to OpenTelemetry tracing.
-		It also transitively pulls all the required OpenTelemetry SDKs required for the
-		span tracing, propagation and instrumentation(setup/config).
-		-->
-		<dependency>
-			<groupId>io.micrometer</groupId>
-			<artifactId>micrometer-tracing-bridge-otel</artifactId>
-		</dependency>
+- Next, add the following dependencies in the `pom.xml` files of all four demo projects for traceId/spanId generation, propagation, and instrumentation.
+	- The `micrometer-tracing-bridge-otel` dependency provides a micrometer bridge/facade to OpenTelemetry tracing. It also transitively pulls all the required OpenTelemetry SDKs required for the span tracing, propagation, and instrumentation(setup/config).
+	     ```XML
+		    <dependency>
+		 	<groupId>io.micrometer</groupId>
+      			<artifactId>micrometer-tracing-bridge-otel</artifactId>
+		    </dependency>
+	    ```
 
-		<!--This dependency provides the logic for exporting/reporting to any
-            OpenTelemetry protocol (OTLP) compliant log collector
-            (in the demo we are using Jaeger)
-        -->
-		<dependency>
-			<groupId>io.opentelemetry</groupId>
-			<artifactId>opentelemetry-exporter-otlp</artifactId>
-		</dependency>
-    ```
+	- The `opentelemetry-exporter-otlp` dependency provides the logic for exporting/reporting to any OpenTelemetry protocol (OTLP) compliant log collector (in the demo we are using Jaeger).
+	     ```XML
+		    <dependency>
+		 	<groupId>io.opentelemetry</groupId>
+      			<artifactId>opentelemetry-exporter-otlp</artifactId>
+		    </dependency>
+	    ```
+
 
 - > **Note:** Including the `spring-boot-starter-actuator` dependency as part of the **[Demo Projects Initial Setup
-](https://github.com/Microservices-Demo-Projects/logging-and-distributed-tracing/tree/main?tab=readme-ov-file#demo-projects-initial-setup)** is required for the log tracing.
+](https://github.com/Microservices-Demo-Projects/logging-and-distributed-tracing/tree/main?tab=readme-ov-file#demo-projects-initial-setup)** is required by the log tracing demo applications.
 
 # HTTP Log Exporter Configuration
 
@@ -80,8 +77,8 @@ This is a proof of concept project demonstrating logging with traceIds and spanI
 # Containerizing the Application
 - To Do...(DockerFile and Build commands)
 
-# CI/CD with Github Actions
+# CI/CD with GitHub Actions
 - To Do...(yaml file config creation)
 
 # Deploying the Application
-- To Do...(Docker Compose and Kubernets Manifest)
+- To Do...(Docker Compose and Kubernetes Manifest)
