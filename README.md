@@ -127,7 +127,7 @@ This is a proof of concept project demonstrating logging with traceIds and spanI
 
     EXPOSE 8081
     ```
-- Similarly the Dockerfiles are written for the other the demo applications with:
+- Similarly the Dockerfiles are written for the other demo applications as:
     - `demo-ms-one` exposes port `8081`
     - `demo-ms-two` exposes port `8082`
     - `demo-ms-three` exposes port `8083`
@@ -140,7 +140,7 @@ This is a proof of concept project demonstrating logging with traceIds and spanI
         docker build --progress plain -t sriramponangi/logging-tracing.demo-ms-one:latest
         ```
         ```shell
-        docker push docker push sriramponangi/logging-tracing.demo-ms-one:latest
+        docker push sriramponangi/logging-tracing.demo-ms-one:latest
         ```
     - `demo-ms-two` application:
     
@@ -148,7 +148,7 @@ This is a proof of concept project demonstrating logging with traceIds and spanI
         docker build --progress plain -t sriramponangi/logging-tracing.demo-ms-two:latest
         ```
         ```shell
-        docker push docker push sriramponangi/logging-tracing.demo-ms-two:latest
+        docker push sriramponangi/logging-tracing.demo-ms-two:latest
         ```
     - `demo-ms-three` application:
     
@@ -156,7 +156,7 @@ This is a proof of concept project demonstrating logging with traceIds and spanI
         docker build --progress plain -t sriramponangi/logging-tracing.demo-ms-three:latest
         ```
         ```shell
-        docker push docker push sriramponangi/logging-tracing.demo-ms-three:latest
+        docker push sriramponangi/logging-tracing.demo-ms-three:latest
         ```
     - `demo-ms-four` application:
     
@@ -164,7 +164,7 @@ This is a proof of concept project demonstrating logging with traceIds and spanI
         docker build --progress plain -t sriramponangi/logging-tracing.demo-ms-four:latest
         ```
         ```shell
-        docker push docker push sriramponangi/logging-tracing.demo-ms-four:latest
+        docker push sriramponangi/logging-tracing.demo-ms-four:latest
         ```
 
 # CI/CD with GitHub Actions
