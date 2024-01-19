@@ -13,7 +13,7 @@ public class OtelConfiguration {
 
     private final String otelCollectorUrl;
 
-    public OtelConfiguration(@Value("${otel.collector.url") String otelCollectorUrl) {
+    public OtelConfiguration(@Value("${otel.collector.url}") String otelCollectorUrl) {
         this.otelCollectorUrl = otelCollectorUrl;
     }
 
