@@ -76,8 +76,9 @@ This is a proof of concept project demonstrating logging with traceIds and spanI
                 probability: 1.0
     ```
 
-# HTTP Log Exporter Configuration
+# Log Exporter Configuration
 
+## `HTTP` Log Exporter Configuration
 - By default, the springboot apps are configured to use the HTTP based log exporter with OTLP log collectors. Therefore, we have to just include the following in `application.yaml`:
     ```YAML
     management:
@@ -86,8 +87,7 @@ This is a proof of concept project demonstrating logging with traceIds and spanI
                 endpoint: ${JAEGER_COLLECTOR_URL:http://jaeger:4318/v1/traces}
     ```
 
-
-# gRPC Log Exporter Configuration
+## `gRPC` Log Exporter Configuration
 
 - To Do...(Application properties and @Configuration class details)
 
