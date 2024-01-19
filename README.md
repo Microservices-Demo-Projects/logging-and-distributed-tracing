@@ -78,7 +78,13 @@ This is a proof of concept project demonstrating logging with traceIds and spanI
 
 # HTTP Log Exporter Configuration
 
-- To Do...(Application properties and @Configuration class details)
+- By default, the springboot apps are configured to use the HTTP based log exporter with OTLP log collectors. Therefore, we have to just include the following in `application.yaml`:
+    ```YAML
+    management:
+        otlp:
+            tracing:
+                endpoint: ${JAEGER_COLLECTOR_URL:http://jaeger:4318/v1/traces}
+    ```
 
 
 # gRPC Log Exporter Configuration
@@ -200,7 +206,8 @@ This is a proof of concept project demonstrating logging with traceIds and spanI
         - `demo-ms-one` application:
 
             ```shell
-            # Note - JAEGER_COLLECTOR_URL environment variable in demo-ms-one should be HTTP API (http://jaeger:4318/v1/traces)
+            # Note - JAEGER_COLLECTOR_URL environment variable in
+            # demo-ms-one should be HTTP API (http://jaeger:4318/v1/traces)
             docker run --rm --name demo-ms-one \
             -p 8081:8081 \
             -e JAEGER_COLLECTOR_URL=http://jaeger:4318/v1/traces \
@@ -211,7 +218,8 @@ This is a proof of concept project demonstrating logging with traceIds and spanI
         - `demo-ms-two` application:
 
             ```shell
-            # Note - JAEGER_COLLECTOR_URL environment variable in demo-ms-one should be HTTP API (http://jaeger:4318/v1/traces)
+            # Note - JAEGER_COLLECTOR_URL environment variable in
+            # demo-ms-one should be HTTP API (http://jaeger:4318/v1/traces)
             docker run --rm --name demo-ms-two \
             -p 8082:8082 \
             -e JAEGER_COLLECTOR_URL=http://jaeger:4318/v1/traces \
@@ -222,7 +230,8 @@ This is a proof of concept project demonstrating logging with traceIds and spanI
         - `demo-ms-three` application:
 
             ```shell
-            # Note - JAEGER_COLLECTOR_URL environment variable in demo-ms-one should be gRPC API (http://jaeger:4317/api/traces)
+            # Note - JAEGER_COLLECTOR_URL environment variable in
+            # demo-ms-one should be gRPC API (http://jaeger:4317/api/traces)
             docker run --rm --name demo-ms-three \
             -p 8083:8083 \
             -e JAEGER_COLLECTOR_URL=http://jaeger:4317/api/traces \
@@ -233,7 +242,8 @@ This is a proof of concept project demonstrating logging with traceIds and spanI
         - `demo-ms-four` application:
 
             ```shell
-            # Note - JAEGER_COLLECTOR_URL environment variable in demo-ms-one should be gRPC API (http://jaeger:4317/api/traces)
+            # Note - JAEGER_COLLECTOR_URL environment variable in
+            # demo-ms-one should be gRPC API (http://jaeger:4317/api/traces)
             docker run --rm --name demo-ms-four \
             -p 8084:8084 \
             -e JAEGER_COLLECTOR_URL=http://jaeger:4317/api/traces \
