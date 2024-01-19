@@ -95,7 +95,6 @@ This is a proof of concept project demonstrating logging with traceIds and spanI
 
 ## `gRPC` Log Exporter Configuration
 
-- To Do...(Application properties and @Configuration class details)
 - Instead of the `HTTP` based log exporter property `management.otlp.tracing.endpoint` from spring, we will create a custom property for `gRPC` based log exporter endpoint as follows in the `application.yaml`:
 
     ```YAML
@@ -190,34 +189,34 @@ This is a proof of concept project demonstrating logging with traceIds and spanI
     - `demo-ms-four` exposes port `8084`
 
 - Commands to build and push the container images to Dockerhub:
-    - `demo-ms-one` application:
+    - `cd ./demo-ms-one` application directory:
 
         ```shell
-        docker build --progress plain -t sriramponangi/logging-tracing.demo-ms-one:latest
+        docker build --progress plain -t sriramponangi/logging-tracing.demo-ms-one:latest .
         ```
         ```shell
         docker push sriramponangi/logging-tracing.demo-ms-one:latest
         ```
-    - `demo-ms-two` application:
+    - `cd ./demo-ms-two` application directory:
     
         ```shell
-        docker build --progress plain -t sriramponangi/logging-tracing.demo-ms-two:latest
+        docker build --progress plain -t sriramponangi/logging-tracing.demo-ms-two:latest .
         ```
         ```shell
         docker push sriramponangi/logging-tracing.demo-ms-two:latest
         ```
-    - `demo-ms-three` application:
+    - `cd ./demo-ms-three` application directory:
     
         ```shell
-        docker build --progress plain -t sriramponangi/logging-tracing.demo-ms-three:latest
+        docker build --progress plain -t sriramponangi/logging-tracing.demo-ms-three:latest .
         ```
         ```shell
         docker push sriramponangi/logging-tracing.demo-ms-three:latest
         ```
-    - `demo-ms-four` application:
+    - `cd ./demo-ms-four` application directory:
     
         ```shell
-        docker build --progress plain -t sriramponangi/logging-tracing.demo-ms-four:latest
+        docker build --progress plain -t sriramponangi/logging-tracing.demo-ms-four:latest .
         ```
         ```shell
         docker push sriramponangi/logging-tracing.demo-ms-four:latest

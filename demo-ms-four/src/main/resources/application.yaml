@@ -29,7 +29,7 @@ client:
     demo-ms-three: http://localhost:8083/three
 
 
-jaeger:
+otel:
   collector:
     # This is gRPC protocol endpoint for OTEL Collector
     url: http://localhost:4317/api/traces

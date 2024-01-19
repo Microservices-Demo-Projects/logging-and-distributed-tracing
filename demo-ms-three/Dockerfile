@@ -7,8 +7,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN pwd && ls -lrtha && chmod 550 ./mvnw && ls -lrtha && \
-    ./mvnw -U clean install && ls -lrtha && ls -lrtha ./target && \
+RUN ls -lrtha && ./mvnw -U clean install && ls -lrtha ./target && \
     mv ./target/demo-ms-three*.jar ./target/demo-ms-three.jar && ls -lrtha ./target
 
 ####################################
