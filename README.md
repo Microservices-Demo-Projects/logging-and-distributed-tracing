@@ -12,11 +12,11 @@ This is a proof of concept project demonstrating logging with traceIds and spanI
 
 - Four demo applications called `demo-ms-one`, `demo-ms-two`, `demo-ms-three` and `demo-ms-four` are created using `springboot 3.2.1`.
 
-- The applications `demo-ms-one` and `demo-ms-three` are be created using springboot **webflux dependency** from https://start.spring.io/ as follows:
+- The applications `demo-ms-one` and `demo-ms-three` are created using springboot **webflux dependency** from https://start.spring.io/ as follows:
 
     ![Spring Web Project Created By Spring Initializer](https://github.com/Microservices-Demo-Projects/logging-and-distributed-tracing/blob/notes/Notes/1-SpringWebflux-Demo-Project-Created-By-Spring-Initializer.png)
 
-- The applications `demo-ms-two` and `demo-ms-four` are be created using springboot **web dependency** from https://start.spring.io/ as follows:
+- The applications `demo-ms-two` and `demo-ms-four` are created using springboot **web dependency** from https://start.spring.io/ as follows:
 
     ![Spring Web Project Created By Spring Initializer](https://github.com/Microservices-Demo-Projects/logging-and-distributed-tracing/blob/notes/Notes/2-SpringWeb-Demo-Project-Created-By-Spring-Initializer.png)
 
