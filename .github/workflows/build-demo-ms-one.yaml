@@ -11,10 +11,6 @@ on:
         description: 'Push Container Image To DockerHub'
         type: boolean
 
-defaults:
- run:
-  working-directory: ./demo-ms-one
-
 jobs: 
   build-container-image:
     runs-on: ubuntu-latest
@@ -36,9 +32,10 @@ jobs:
 
       - name: Build and push container image
         uses: docker/build-push-action@v5
+        
         with:
-          context: .
-          file: ./Dockerfile
+          context: ./demo-ms-one
+          file: ./demo-ms-one/Dockerfile
           push: ${{ github.event.inputs.shouldPushImageToDockerHub }}
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/logging-tracing.demo-ms-one:${{ github.event.inputs.imageTag }}
         
