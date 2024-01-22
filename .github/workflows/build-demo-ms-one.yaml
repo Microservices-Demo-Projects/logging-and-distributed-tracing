@@ -35,7 +35,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./Dockerfile
+          file: ./demo-ms-one/Dockerfile
           push: ${{ github.event.inputs.shouldPushImageToDockerHub }}
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/logging-tracing.demo-ms-one:${{ github.event.inputs.imageTag }}
         
