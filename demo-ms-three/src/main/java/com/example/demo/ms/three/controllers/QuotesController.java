@@ -22,19 +22,20 @@ public class QuotesController {
 
     private final String applicationName;
     private final String applicationBaseApiUrl;
-
     private final WebClient webClient;
 
-    public QuotesController(@Value("{spring.application.name}") String applicationName,
-                            @Value("{server.servlet.context-path}") String applicationBaseApiUrl,
-                            @Value("{client.base-url.demo-ms-two}") String clientBaseUrl) {
+    public QuotesController(@Value("${spring.application.name}") String applicationName,
+                            @Value("${spring.webflux.base-path}") String applicationBaseApiUrl,
+                            @Value("${client.base-url.demo-ms-two}") String clientBaseUrl,
+                            WebClient.Builder webClientBuilder) {
 
         this.applicationName = applicationName;
         this.applicationBaseApiUrl = applicationBaseApiUrl;
 
-        // NOTE: Creating the WebClient instance using the WebClient.builder()
+        // NOTE: Creating the WebClient instance using the WebClient.builder() injected/autowired by springBoot
         // sets the necessary defaults for traceId/SpanId propagation across microservice API calls.
-        webClient = WebClient.builder().baseUrl(clientBaseUrl).build();
+        webClient = webClientBuilder.baseUrl(clientBaseUrl).build();
+
     }
 
     @CrossOrigin

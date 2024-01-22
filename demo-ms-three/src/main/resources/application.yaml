@@ -1,9 +1,9 @@
 server:
   port: 8083
-  servlet:
-    context-path: /three
 
 spring:
+  webflux:
+    base-path: /three
   application:
     # The spring.application.name property is required.
     # Spring uses the application name as the service name

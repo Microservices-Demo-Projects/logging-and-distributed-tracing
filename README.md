@@ -313,3 +313,6 @@ This is a proof of concept project demonstrating logging with traceIds and spanI
 - **[Common Springboot Application Properties
 ](https://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/html/application-properties.html)**
     - For example refer: `management.otlp.tracing.*` properties.
+- **[Configuring Webflux Context to Include TraceId/SpanId in logs](https://javed0863.medium.com/springboot3-debugging-and-tracing-requests-using-micrometer-in-webflux-7d954de82f25)** 
+    - > This configuraiton is required because one request in webflux APIs can be processed to by multiple threads and including the traceId/spanId in thread context (MDC) is required.
+    

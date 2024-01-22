@@ -25,9 +25,9 @@ public class QuotesController {
     private final String clientBaseUrl;
     private final RestTemplate restTemplate;
 
-    public QuotesController(@Value("{spring.application.name}") String applicationName,
-                            @Value("{server.servlet.context-path}") String applicationBaseApiUrl,
-                            @Value("{client.base-url.demo-ms-three}") String clientBaseUrl,
+    public QuotesController(@Value("${spring.application.name}") String applicationName,
+                            @Value("${server.servlet.context-path}") String applicationBaseApiUrl,
+                            @Value("${client.base-url.demo-ms-three}") String clientBaseUrl,
                             RestTemplateBuilder restTemplateBuilder) {
 
         this.applicationName = applicationName;

@@ -25,9 +25,9 @@ public class QuotesController {
     private final String clientBaseUrl;
     private final RestTemplate restTemplate;
 
-    public QuotesController(@Value("{spring.application.name}") String applicationName,
-                            @Value("{server.servlet.context-path}") String applicationBaseApiUrl,
-                            @Value("{client.base-url.demo-ms-one}") String clientBaseUrl,
+    public QuotesController(@Value("${spring.application.name}") String applicationName,
+                            @Value("${server.servlet.context-path}") String applicationBaseApiUrl,
+                            @Value("${client.base-url.demo-ms-one}") String clientBaseUrl,
                             RestTemplateBuilder restTemplateBuilder) {
 
         this.applicationName = applicationName;
@@ -46,6 +46,7 @@ public class QuotesController {
         log.debug("[RECEIVED] :: API call request to {}/quote", applicationBaseApiUrl);
         log.trace("=======================================================");
         headers.forEach((key, value) -> log.debug("[REQUEST_HEADER] :: {} = {}", key, value));
+        log.debug("[STARTED] :: API call to {}/quote", clientBaseUrl);
 
         ResponseEntity<QuoteResponse> quoteResponseEntity = restTemplate.exchange(clientBaseUrl+"/quote",
                 HttpMethod.GET, null, QuoteResponse.class);
