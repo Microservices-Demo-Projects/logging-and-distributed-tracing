@@ -1,0 +1,59 @@
+name: 'CI - demo-ms-three'
+
+on:
+  workflow_dispatch:
+    inputs:
+      imageTag:
+        description: 'Container Image Tag'
+        required: true
+        default: 'latest'
+      shouldPushImageToDockerHub:
+        description: 'Push Container Image To DockerHub'
+        type: boolean
+
+jobs: 
+  build-container-image:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Modify maven wrapper permission
+        run: |
+          pwd
+          ls -lrtha
+          cd ./demo-ms-three
+          pwd 
+          ls -lrtha
+          chmod 777 mvnw
+          ls -lrtha
+          # Creating an environment variable called APPLICATION_VERSION from application version in pom.mxl
+          echo "APPLICATION_VERSION=$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout -Dbuild.source=${GITHUB_REF##*/} -Dbuild.number=${{ github.run_number }})" >> "$GITHUB_ENV"
+
+
+      - name: Log Image Tags
+        run: |
+          echo "Application Version | Image Tag - 1 : $APPLICATION_VERSION"
+          echo "Manual Input        | Image Tag - 2 : ${{ github.event.inputs.imageTag }}"
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          # Default is dockerHub
+          # registry: ghcr.io
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push container image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./demo-ms-three
+          file: ./demo-ms-three/Dockerfile
+          push: ${{ github.event.inputs.shouldPushImageToDockerHub }}
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/logging-tracing.demo-ms-three:${{ github.event.inputs.imageTag }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/logging-tracing.demo-ms-three:${{ env.APPLICATION_VERSION }}
