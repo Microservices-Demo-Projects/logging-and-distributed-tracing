@@ -53,5 +53,7 @@ jobs:
           context: ./demo-ms-one
           file: ./demo-ms-one/Dockerfile
           push: ${{ github.event.inputs.shouldPushImageToDockerHub }}
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/logging-tracing.demo-ms-one:${{ github.event.inputs.imageTag }}, ${{ secrets.DOCKER_HUB_USERNAME }}/logging-tracing.demo-ms-one:${{ env.APPLICATION_VERSION }}
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/logging-tracing.demo-ms-one:${{ github.event.inputs.imageTag }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/logging-tracing.demo-ms-one:${{ env.APPLICATION_VERSION }}
 
