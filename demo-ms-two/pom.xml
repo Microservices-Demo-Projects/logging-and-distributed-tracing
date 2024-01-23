@@ -10,10 +10,17 @@
 	</parent>
 	<groupId>com.example</groupId>
 	<artifactId>demo-ms-two</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>${revision}</version>
 	<name>demo-ms-two</name>
 	<description>Demo project for Spring Boot</description>
+	
 	<properties>
+		<revision>${major.version}.${minor.version}.${patch.version}-${build.source}${build.number}</revision>
+	        <major.version>1</major.version>
+	        <minor.version>0</minor.version>
+	        <patch.version>0</patch.version>
+	        <build.number>0</build.number>
+	        <build.source>local</build.source>
 		<java.version>21</java.version>
 	</properties>
 
