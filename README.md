@@ -181,7 +181,7 @@ This is a proof of concept project demonstrating logging of traceIds and spanIds
     - The example below is for `demo-ms-one` app which exposes port `8081`:
  
     	```Dockerfile
-            ####################################
+    	    ####################################
             # STAGE 1: Build Application
             ####################################
             FROM amazoncorretto:21.0.1-al2023-headless AS builder
@@ -345,17 +345,17 @@ This is a proof of concept project demonstrating logging of traceIds and spanIds
 
 
 # CI/CD with GitHub Actions
-- The the demo applications can also be built and their container image can be pushed into DockerHub using the CI pipelines/workflows created using GitHub Actions:
+- The demo applications can also be built and their container image can be pushed into DockerHub using the CI pipelines/workflows created using GitHub Actions:
 
     -  Continuous Integration (CI) workflows are configured to be triggered manually by providing the following arguments:
 
     	- Argument - 1: `Container Image Tag` is a string and the default value is latest.
 
-	- Argument - 2: `Push Container Image To DockerHub` is a boolean and the default value is false.
+        - Argument - 2: `Push Container Image To DockerHub` is a boolean and the default value is false.
   
-    - **Note:** If the CI workflow successfully completes build the container image successfully and if the argument `Push Container Image To DockerHub` is set to true then the CI workflow will push the following two images to the corresponding DockerHub repo:
+    - **Note:** If the CI workflow successfully builds the container image and if the argument `Push Container Image To DockerHub` is set to true then the CI workflow will push the following two images to the corresponding DockerHub repo:
 
-      - First image is pushed with custom tag name provided as input while manually triggering the CI pipeline workflow.
+      - First image is pushed with custom tag name provided as input argument to `Container Image Tag` while manually triggering the CI pipeline workflow.
 
       - Second image is pushed with the value of `project.version` in the application's pom.xml file.
 
