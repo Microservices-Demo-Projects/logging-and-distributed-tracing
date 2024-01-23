@@ -29,7 +29,8 @@ jobs:
           chmod 777 mvnw
           ls -lrtha
           # Creating an environment variable called APPLICATION_VERSION from application version in pom.mxl
-          echo "APPLICATION_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> "$GITHUB_ENV"
+          echo "APPLICATION_VERSION=$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout -Dbuild.source=${GITHUB_REF##*/} -Dbuild.number=${{ github.run_number }})" >> "$GITHUB_ENV"
+
 
       - name: Log Image Tags
         run: |
