@@ -1,4 +1,4 @@
-name: 'Build demo-ms-one application'
+name: 'CI :: demo-ms-one'
 
 on:
   workflow_dispatch:
