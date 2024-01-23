@@ -1,6 +1,6 @@
 # logging-and-distributed-tracing
 
-This is a proof of concept project demonstrating logging with traceIds and spanIds across SpringBoot microservices and integrating it with Jaeger for visualization and analysis. All the applications are deployed using Docker and Kubernetes(Service Mesh).
+This is a proof of concept project demonstrating logging of traceIds and spanIds across SpringBoot microservices and integrating it with Jaeger for visualization and analysis. All the applications are deployed using Docker and Kubernetes(Service Mesh).
 
 
 # High-Level Design
@@ -23,7 +23,7 @@ This is a proof of concept project demonstrating logging with traceIds and spanI
 
 # Configuring Other Dependencies
 
-- Include the following BOMs in the `pom.xml` files of all four demo projects so that we can get the other dependencies corresponding to the BOMs that are required and compatible without mentioning the specific dependency versions everywhere.
+- Include the following BOMs in the `pom.xml` files of all four demo projects so that we can get the other dependencies corresponding that are required and compatible for logging traceIds without mentioning the specific dependency versions everywhere.
 
     ```XML
     <dependencyManagement>
@@ -56,7 +56,7 @@ This is a proof of concept project demonstrating logging with traceIds and spanI
 		    </dependency>
 	    ```
 
-	- The `opentelemetry-exporter-otlp` dependency provides the logic for exporting/reporting to any OpenTelemetry protocol (OTLP) compliant log collector (in the demo we are using Jaeger).
+	- The `opentelemetry-exporter-otlp` dependency provides the logic for exporting/reporting to any OpenTelemetry protocol (OTLP) compliant log collector (e.g., Jaeger).
 
 	     ```XML
 		    <dependency>
@@ -67,7 +67,7 @@ This is a proof of concept project demonstrating logging with traceIds and spanI
 
 
 - > **Note:** Including the `spring-boot-starter-actuator` dependency as part of the **[Demo Projects Initial Setup
-](https://github.com/Microservices-Demo-Projects/logging-and-distributed-tracing/tree/main?tab=readme-ov-file#demo-projects-initial-setup)** is required by the log tracing demo applications.
+](https://github.com/Microservices-Demo-Projects/logging-and-distributed-tracing/tree/main?tab=readme-ov-file#demo-projects-initial-setup)** is required for logging the traceIds/SpanIds in the demo applications.
 
 # Log Sampling Configuration
 - By default, springboot sets the sampling rate to `0.1` (i.e., 10%) to reduce the log data collected and reported to the OTLP log collector (e.g., Jaeger). When a span is not sampled, it adds no overhead (a noop).
@@ -89,7 +89,7 @@ This is a proof of concept project demonstrating logging with traceIds and spanI
     management:
         otlp:
             tracing:
-                # The default HTTP protocol endpoint for OTEL Collector
+                # The default HTTP protocol endpoint for Jaeger OTEL Collector
                 endpoint: ${JAEGER_COLLECTOR_URL:http://localhost:4318/v1/traces}
     ```
 
@@ -100,93 +100,124 @@ This is a proof of concept project demonstrating logging with traceIds and spanI
     ```YAML
     otel:
         collector:
-            # This is gRPC protocol endpoint for OTEL Collector
+            # This is gRPC protocol endpoint for Jaeger OTEL Collector
             url: http://localhost:4317/api/traces
     ```
-- Then, we have to create a custom `@Configuration` class as follows:
+- Then, we have to create a custom `@Configuration` class to create bean objects for `OtlpGrpcSpanExporter` and `TextMapPropagator` as follows:
 
     ```java
-    package com.example.demo.ms.three.configs;
+	package com.example.demo.ms.three.configs;
 
-    import io.opentelemetry.context.propagation.TextMapPropagator;
-    import io.opentelemetry.exporter.otlp.trace.OtlpGrpcSpanExporter;
-    import io.opentelemetry.extension.trace.propagation.JaegerPropagator;
-    import org.springframework.beans.factory.annotation.Value;
-    import org.springframework.context.annotation.Bean;
-    import org.springframework.context.annotation.Configuration;
-    import org.springframework.http.HttpHeaders;
-
-    @Configuration
-    public class OtelConfiguration {
-
-        private final String otelCollectorUrl;
-
-        public OtelConfiguration(@Value("${otel.collector.url") String otelCollectorUrl) {
-            this.otelCollectorUrl = otelCollectorUrl;
-        }
-
-        @Bean
-        public TextMapPropagator jaegerPropagator() {
-            return JaegerPropagator.getInstance();
-        }
-
-        /**
-        * This custom bean definition method is required if we want to use gRPC (typical port 4317)
-        * instead of the default HTTP protocol (typically on port 4318) for exporting the span.
-        * By default, the Spring's OtlpAutoConfiguration class will setup the OtlpHttpSpanExporter bean.
-        * @return OtlpGrpcSpanExporter
-        */
-        @Bean
-        public OtlpGrpcSpanExporter grpcSpanExporter(){
-            return OtlpGrpcSpanExporter.builder()
-                    .addHeader(HttpHeaders.CONTENT_TYPE, "application/x-protobuf")
-                    .setEndpoint(otelCollectorUrl)
-                    .build();
-        }
-    }
+	import io.opentelemetry.context.propagation.TextMapPropagator;
+	import io.opentelemetry.exporter.otlp.trace.OtlpGrpcSpanExporter;
+	import io.opentelemetry.extension.trace.propagation.JaegerPropagator;
+	import org.springframework.beans.factory.annotation.Value;
+	import org.springframework.context.annotation.Bean;
+	import org.springframework.context.annotation.Configuration;
+	import org.springframework.http.HttpHeaders;
+	
+	@Configuration
+	public class OtelConfiguration {
+	
+	    private final String otelCollectorUrl;
+	
+	    public OtelConfiguration(@Value("${otel.collector.url}") String otelCollectorUrl) {
+		this.otelCollectorUrl = otelCollectorUrl;
+	    }
+	
+	    @Bean
+	    public TextMapPropagator jaegerPropagator() {
+		return JaegerPropagator.getInstance();
+	    }
+	
+	    /**
+	     * This custom bean definition method is required if we want to use gRPC (typical port 4317)
+	     * instead of the default HTTP protocol (typically on port 4318) for exporting the span.
+	     * By default, the Spring's OtlpAutoConfiguration class will setup the OtlpHttpSpanExporter bean.
+	     * @return OtlpGrpcSpanExporter
+	     */
+	    @Bean
+	    public OtlpGrpcSpanExporter grpcSpanExporter(){
+		return OtlpGrpcSpanExporter.builder()
+			.addHeader(HttpHeaders.CONTENT_TYPE, "application/x-protobuf")
+			.setEndpoint(otelCollectorUrl)
+			.build();
+	    }
+	}
     ```
+
+- Finally, for the reactive springboot applications that are created using **webflux dependency** (e.g., `demo-ms-one` and `demo-ms-three`) we have to configure a WebFilter so that we can add the traceId/SpaceId into the thread context. This is necessary because in a reactive application multiple threads can process a single request and therefore we have to inlcude the the correct traceId/SpaceId in the current thread context so that logger can use it in the MDC and make those values available in the generated logs. An example of the custom `WebFilter` class is as follows:
+    ```java
+	package com.example.demo.ms.three.configs;
+
+	import io.micrometer.context.ContextSnapshot;
+	import io.micrometer.observation.contextpropagation.ObservationThreadLocalAccessor;
+	import org.springframework.stereotype.Component;
+	import org.springframework.web.server.ServerWebExchange;
+	import org.springframework.web.server.WebFilter;
+	import org.springframework.web.server.WebFilterChain;
+	import reactor.core.publisher.Mono;
+	
+	
+	@Component
+	public class RequestMonitorWebFilter implements WebFilter {
+	    @Override
+	    public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+	        return chain.filter(exchange)
+	                // Preparing context for the Tracer Span used in TracerConfiguration
+	                .contextWrite(context -> {
+	                    ContextSnapshot.setThreadLocalsFrom(context, ObservationThreadLocalAccessor.KEY);
+	                    return context;
+	                });
+	    }
+	}
+    ```
+
+- > Note: Along with the sample code provided in the README.md also refer to the demo application's code.
 
 # Containerizing the Application
 - The four demo apps are using spring boot, maven and Java 21 therefore we will create a two stage dockerfile as follows to containerize the demo apps.
-    - The example below is for `demo-ms-one` app which exposes port `8081` :
 
-    ```Dockerfile
-    ####################################
-    # STAGE 1: Build Application
-    ####################################
-    FROM amazoncorretto:21.0.1-al2023-headless AS builder
+    - The example below is for `demo-ms-one` app which exposes port `8081`:
+ 
+    	```Dockerfile
+            ####################################
+            # STAGE 1: Build Application
+            ####################################
+            FROM amazoncorretto:21.0.1-al2023-headless AS builder
 
-    WORKDIR /app
+            WORKDIR /app
 
-    COPY . .
+            COPY . .
 
-    RUN pwd && ls -lrtha && chmod 550 ./mvnw && ls -lrtha && \
-        ./mvnw -U clean install && ls -lrtha && ls -lrtha ./target && \
-        mv ./target/demo-ms-one*.jar ./target/demo-ms-one.jar && ls -lrtha ./target
+            RUN ls -lrtha && ./mvnw -U clean install && ls -lrtha ./target && \
+                    mv ./target/demo-ms-one*.jar ./target/demo-ms-one.jar && ls -lrtha ./target
 
-    ####################################
-    # STAGE 2: Setup Executable Image
-    ####################################
-    FROM amazoncorretto:21.0.1-al2023-headless
 
-    # NOTE - 'nobody' is an existing user with the least privileges in the amazoncorretto image
-    USER nobody
+            ####################################
+            # STAGE 2: Setup Executable Image
+            ####################################
+            FROM amazoncorretto:21.0.1-al2023-headless
 
-    WORKDIR /app
+            # RUN adduser -u 7788 -D appuser
+            # nobody is an existing user with least permissions
+            USER nobody
 
-    COPY --chown=nobody:nobody --from=builder /app/target/demo-ms-one.jar /app/demo-ms-one.jar
+            WORKDIR /app
 
-    RUN pwd && ls -lrtha /app
+            COPY --chown=nobody:nobody --from=builder /app/target/demo-ms-one.jar /app/demo-ms-one.jar
 
-    CMD java -jar /app/demo-ms-one.jar
+            RUN pwd && ls -lrtha / && ls -lrtha /app
 
-    EXPOSE 8081
-    ```
-- Similarly the Dockerfiles are written for the other demo applications as:
-    - `demo-ms-one` exposes port `8081`
-    - `demo-ms-two` exposes port `8082`
-    - `demo-ms-three` exposes port `8083`
-    - `demo-ms-four` exposes port `8084`
+            CMD java -jar /app/demo-ms-one.jar --server.port=8081
+
+            EXPOSE 8081
+       ```
+    - Similarly the Dockerfiles are written for the all demo applications as:
+    	- `demo-ms-one` exposes port `8081`
+    	- `demo-ms-two` exposes port `8082`
+    	- `demo-ms-three` exposes port `8083`
+    	- `demo-ms-four` exposes port `8084`
 
 - Commands to build and push the container images to Dockerhub:
     - `cd ./demo-ms-one` application directory:
@@ -222,97 +253,134 @@ This is a proof of concept project demonstrating logging with traceIds and spanI
         docker push sriramponangi/logging-tracing.demo-ms-four:latest
         ```
 
-# CI/CD with GitHub Actions
-- To Do...(yaml file config creation)
-
 # Deploying the Application
 
-- **Deploying the application using docker commands:**
-    - Create a common network to link all the docker containers.
-        ```shell
-        docker network create demoapps
-        ```
-    - We have to first start the jaeger applications before all the demo microservice apps so that it is ready to collect logs sent by them. 
-        ```shell
-        ## make sure to expose only the ports you use in your deployment scenario!
-        docker run -d --name jaeger \
-        -e COLLECTOR_OTLP_ENABLED=true \
-        -e COLLECTOR_ZIPKIN_HOST_PORT=:9411 \
-        -p 5775:5775/udp \
-        -p 6831:6831/udp \
-        -p 6832:6832/udp \
-        -p 5778:5778 \
-        -p 16686:16686 \
-        -p 14250:14250 \
-        -p 14268:14268 \
-        -p 14269:14269 \
-        -p 4317:4317 \
-        -p 4318:4318 \
-        -p 9411:9411 \
-        --network demoapps \
-        jaegertracing/all-in-one:1.53
-        ```    
-        - Navigate to **http://localhost:16686** to access the Jaeger UI.
-        - The details on port mappings and different ways to configure the Jaeger app are given here:
-            - **https://www.jaegertracing.io/docs/1.6/getting-started/**
-            - **https://www.jaegertracing.io/docs/1.53/deployment/**
+## **Deploying the application using Docker commands:**
+
+- Create a common network to link all the docker containers.
+  ```shell
+    docker network create demoapps
+  ```
+
+- We have to first start the jaeger applications before all the demo microservice apps so that it is ready to collect logs sent by them. 
+  ```shell
+    ## make sure to expose only the ports you use in your deployment scenario!
+    docker run -d --name jaeger \
+    -e COLLECTOR_OTLP_ENABLED=true \
+    -e COLLECTOR_ZIPKIN_HOST_PORT=:9411 \
+    -p 5775:5775/udp \
+    -p 6831:6831/udp \
+    -p 6832:6832/udp \
+    -p 5778:5778 \
+    -p 16686:16686 \
+    -p 14250:14250 \
+    -p 14268:14268 \
+    -p 14269:14269 \
+    -p 4317:4317 \
+    -p 4318:4318 \
+    -p 9411:9411 \
+    --network demoapps \
+    jaegertracing/all-in-one:1.53
+  ```    
+
+- Navigate to **http://localhost:16686** to access the Jaeger UI.
+  - The details on port mappings and different ways to configure the Jaeger app are given here:
+    - **https://www.jaegertracing.io/docs/1.6/getting-started/**
+    - **https://www.jaegertracing.io/docs/1.53/deployment/**
     
-    - Then start the four demo microservice applications in the following sequence:
-        - `demo-ms-one` application:
+  - Then start the four demo microservice applications in the following sequence:
+    - `demo-ms-one` application:
 
-            ```shell
-            # Note - JAEGER_COLLECTOR_URL environment variable in
-            # demo-ms-one should be HTTP API (http://jaeger:4318/v1/traces)
-            docker run --rm --name demo-ms-one \
-            -p 8081:8081 \
-            -e JAEGER_COLLECTOR_URL=http://jaeger:4318/v1/traces \
-            --network demoapps \
-            sriramponangi/logging-tracing.demo-ms-one:latest
-            ```
+      ```shell
+        # Note - JAEGER_COLLECTOR_URL environment variable in
+        # demo-ms-one should be HTTP API (http://jaeger:4318/v1/traces)
+        docker run --rm --name demo-ms-one \
+        -p 8081:8081 \
+        -e JAEGER_COLLECTOR_URL=http://jaeger:4318/v1/traces \
+        -network demoapps \
+        sriramponangi/logging-tracing.demo-ms-one:latest
+      ```
 
-        - `demo-ms-two` application:
+    - `demo-ms-two` application:
 
-            ```shell
-            # Note - JAEGER_COLLECTOR_URL environment variable in
-            # demo-ms-one should be HTTP API (http://jaeger:4318/v1/traces)
-            docker run --rm --name demo-ms-two \
-            -p 8082:8082 \
-            -e JAEGER_COLLECTOR_URL=http://jaeger:4318/v1/traces \
-            --network demoapps \
-            sriramponangi/logging-tracing.demo-ms-two:latest
-            ```
+      ```shell
+        # Note - JAEGER_COLLECTOR_URL environment variable in
+        # demo-ms-one should be HTTP API (http://jaeger:4318/v1/traces)
+        docker run --rm --name demo-ms-two \
+        -p 8082:8082 \
+        -e JAEGER_COLLECTOR_URL=http://jaeger:4318/v1/traces \
+        --network demoapps \
+        sriramponangi/logging-tracing.demo-ms-two:latest
+      ```
 
-        - `demo-ms-three` application:
+    - `demo-ms-three` application:
 
-            ```shell
-            # Note - JAEGER_COLLECTOR_URL environment variable in
-            # demo-ms-one should be gRPC API (http://jaeger:4317/api/traces)
-            docker run --rm --name demo-ms-three \
-            -p 8083:8083 \
-            -e JAEGER_COLLECTOR_URL=http://jaeger:4317/api/traces \
-            --network demoapps \
-            sriramponangi/logging-tracing.demo-ms-three:latest
-            ```
+      ```shell
+        # Note - JAEGER_COLLECTOR_URL environment variable in
+        # demo-ms-one should be gRPC API (http://jaeger:4317/api/traces)
+        docker run --rm --name demo-ms-three \
+        -p 8083:8083 \
+        -e JAEGER_COLLECTOR_URL=http://jaeger:4317/api/traces \
+        --network demoapps \
+        sriramponangi/logging-tracing.demo-ms-three:latest
+      ```
 
         - `demo-ms-four` application:
 
-            ```shell
-            # Note - JAEGER_COLLECTOR_URL environment variable in
-            # demo-ms-one should be gRPC API (http://jaeger:4317/api/traces)
-            docker run --rm --name demo-ms-four \
-            -p 8084:8084 \
-            -e JAEGER_COLLECTOR_URL=http://jaeger:4317/api/traces \
-            --network demoapps \
-            sriramponangi/logging-tracing.demo-ms-four:latest
-            ```
+      ```shell
+        # Note - JAEGER_COLLECTOR_URL environment variable in
+        # demo-ms-one should be gRPC API (http://jaeger:4317/api/traces)
+        docker run --rm --name demo-ms-four \
+        -p 8084:8084 \
+        -e JAEGER_COLLECTOR_URL=http://jaeger:4317/api/traces \
+        --network demoapps \
+        sriramponangi/logging-tracing.demo-ms-four:latest
+      ```
 
-- To Do...(Docker Compose and Kubernetes (ServiceMesh) Manifest)
+## To Do: Docker Compose Yaml
+...
+
+## To Do: Kubernetes (ServiceMesh) Manifest Yaml
+...
 
 
+# CI/CD with GitHub Actions
+- The the demo applications can also be built and their container image can be pushed into DockerHub using the CI pipelines/workflows created using GitHub Actions:
+
+    -  Continuous Integration (CI) workflows are configured to be triggered manually by providing the following arguments:
+
+    	- Argument - 1: `Container Image Tag` is a string and the default value is latest.
+
+	- Argument - 2: `Push Container Image To DockerHub` is a boolean and the default value is false.
+  
+    - **Note:** If the CI workflow successfully completes build the container image successfully and if the argument `Push Container Image To DockerHub` is set to true then the CI workflow will push the following two images to the corresponding DockerHub repo:
+
+      - First image is pushed with custom tag name provided as input while manually triggering the CI pipeline workflow.
+
+      - Second image is pushed with the value of `project.version` in the application's pom.xml file.
+
+    - The CI workflows will push the container images built to the following DockerHub repositories:
+  
+      - `CI - demo-ms-one` pushes to https://hub.docker.com/repository/docker/sriramponangi/logging-tracing.demo-ms-one/general
+  
+      - `CI - demo-ms-two` pushes to https://hub.docker.com/repository/docker/sriramponangi/logging-tracing.demo-ms-two/general
+  
+      - `CI - demo-ms-three` pushes to https://hub.docker.com/repository/docker/sriramponangi/logging-tracing.demo-ms-three/general
+  
+      - `CI - demo-ms-four` pushes to https://hub.docker.com/repository/docker/sriramponangi/logging-tracing.demo-ms-four/general
+  
+    - For more details on the GitHub Actions CI workflows refer to the yaml workflows here: https://github.com/Microservices-Demo-Projects/logging-and-distributed-tracing/tree/main/.github/workflows
+
+  
 # References:
+- **[Springboot Docs for micrometer-tracing](https://docs.spring.io/spring-boot/docs/current/reference/html/actuator.html#actuator.micrometer-tracing)**
+
 - **[Common Springboot Application Properties
 ](https://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/html/application-properties.html)**
+
     - For example refer: `management.otlp.tracing.*` properties.
-- **[Configuring Webflux Context to Include TraceId/SpanId in logs](https://javed0863.medium.com/springboot3-debugging-and-tracing-requests-using-micrometer-in-webflux-7d954de82f25)** 
+
+- **[Configuring Webflux Context to Include TraceId/SpanId in logs](https://javed0863.medium.com/springboot3-debugging-and-tracing-requests-using-micrometer-in-webflux-7d954de82f25)**
+  
     - > This configuraiton is required because one request in webflux APIs can be processed to by multiple threads and including the traceId/spanId in thread context (MDC) is required.
     
