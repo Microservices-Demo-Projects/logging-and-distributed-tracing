@@ -341,6 +341,12 @@ This is a proof of concept project demonstrating logging of traceIds and spanIds
 ...
 
 ## To Do: Kubernetes (ServiceMesh) Manifest Yaml
+
+> Using the following command we will generate API request load to /four/quote
+```shell
+n=0; while [[ $n -lt 100 ]]; do sleep 3 && date && echo -e "Execution $n" \
+&& curl -X GET http://demo-ms-four:8084/four/quote ; n=$((n+1)); done
+```
 ...
 
 
@@ -384,3 +390,5 @@ This is a proof of concept project demonstrating logging of traceIds and spanIds
   
     - > This configuraiton is required because one request in webflux APIs can be processed to by multiple threads and including the traceId/spanId in thread context (MDC) is required.
     
+
+
