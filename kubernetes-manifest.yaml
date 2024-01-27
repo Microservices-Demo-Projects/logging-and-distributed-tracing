@@ -1,0 +1,291 @@
+apiVersion: v1
+kind: List
+items:
+
+- kind: Namespace
+  apiVersion: v1
+  metadata:
+    name: service-mesh-demo
+    labels:
+      name: service-mesh-demo
+
+############################################################################
+
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: demo-ms-one-deployment
+    namespace: service-mesh-demo
+    labels:
+      project: log-tracing-demo
+      framework: springboot
+      type: microservice
+      app: demo-ms-one
+      version: v1
+  spec:
+    template:
+      metadata:
+        annotations:
+          sidecar.istio.io/inject: 'true'
+        name: demo-ms-one-pod
+        labels:
+          project: log-tracing-demo
+          framework: springboot
+          type: microservice
+          app: demo-ms-one
+      spec:
+        containers:
+          - name: demo-ms-one-container
+            image: docker.io/sriramponangi/logging-tracing.demo-ms-one:latest
+            imagePullPolicy: Always
+            ports:
+            - containerPort: 8081
+            env:
+            - name: JAEGER_COLLECTOR_URL
+              value: http://jaeger-collector.istio-system:4318/v1/traces
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+    replicas: 1
+    selector:
+      matchLabels:
+        project: log-tracing-demo
+        framework: springboot
+        type: microservice
+        app: demo-ms-one
+
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: demo-ms-one
+    namespace: service-mesh-demo
+    labels:
+      project: k8s-demo
+      framework: springboot
+      type: microservice
+      app: demo-ms-one
+  spec:
+    type: ClusterIP
+    ports:
+      - name: demo-ms-one-api-http
+        port: 8081
+    selector:
+      project: log-tracing-demo
+      framework: springboot
+      type: microservice
+      app: demo-ms-one
+
+############################################################################
+
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: demo-ms-two-deployment
+    namespace: service-mesh-demo
+    labels:
+      project: log-tracing-demo
+      framework: springboot
+      type: microservice
+      app: demo-ms-two
+      version: v1
+  spec:
+    template:
+      metadata:
+        annotations:
+          sidecar.istio.io/inject: 'true'
+        name: demo-ms-two-pod
+        labels:
+          project: log-tracing-demo
+          framework: springboot
+          type: microservice
+          app: demo-ms-two
+      spec:
+        containers:
+          - name: demo-ms-two-container
+            image: docker.io/sriramponangi/logging-tracing.demo-ms-two:latest
+            imagePullPolicy: Always
+            ports:
+            - containerPort: 8082
+            env:
+            - name: CLIENT_BASEURL_DEMOMSONE
+              value: http://demo-ms-one:8081/one
+            - name: JAEGER_COLLECTOR_URL
+              value: http://jaeger-collector.istio-system:4318/v1/traces
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+    replicas: 1
+    selector:
+      matchLabels:
+        project: log-tracing-demo
+        framework: springboot
+        type: microservice
+        app: demo-ms-two
+
+
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: demo-ms-two
+    namespace: service-mesh-demo
+    labels:
+      project: log-tracing-demo
+      framework: springboot
+      type: microservice
+      app: demo-ms-two
+  spec:
+    type: ClusterIP
+    ports:
+      - name: demo-ms-two-api-http
+        port: 8082
+    selector:
+      project: log-tracing-demo
+      framework: springboot
+      type: microservice
+      app: demo-ms-two
+
+############################################################################
+
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: demo-ms-three-deployment
+    namespace: service-mesh-demo
+    labels:
+      project: log-tracing-demo
+      framework: springboot
+      type: microservice
+      app: demo-ms-three
+      version: v1
+  spec:
+    template:
+      metadata:
+        annotations:
+          sidecar.istio.io/inject: 'true'
+        name: demo-ms-three-pod
+        labels:
+          project: log-tracing-demo
+          framework: springboot
+          type: microservice
+          app: demo-ms-three
+      spec:
+        containers:
+          - name: demo-ms-three-container
+            image: docker.io/sriramponangi/logging-tracing.demo-ms-three:latest
+            imagePullPolicy: Always
+            ports:
+            - containerPort: 8083
+            env:
+            - name: CLIENT_BASEURL_DEMOMSTWO
+              value: http://demo-ms-two:8082/two
+            - name: JAEGER_COLLECTOR_URL
+              value: http://jaeger-collector.istio-system:4317/api/traces
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+    replicas: 1
+    selector:
+      matchLabels:
+        project: log-tracing-demo
+        framework: springboot
+        type: microservice
+        app: demo-ms-three
+
+
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: demo-ms-three
+    namespace: service-mesh-demo
+    labels:
+      project: log-tracing-demo
+      framework: springboot
+      type: microservice
+      app: demo-ms-three
+  spec:
+    type: ClusterIP
+    ports:
+      - name: demo-ms-three-api-http
+        port: 8083
+    selector:
+      project: log-tracing-demo
+      framework: springboot
+      type: microservice
+      app: demo-ms-three
+
+
+############################################################################
+
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: demo-ms-four-deployment
+    namespace: service-mesh-demo
+    labels:
+      project: log-tracing-demo
+      framework: springboot
+      type: microservice
+      app: demo-ms-four
+      version: v1
+  spec:
+    template:
+      metadata:
+        annotations:
+          sidecar.istio.io/inject: 'true'
+        name: demo-ms-four-pod
+        labels:
+          project: log-tracing-demo
+          framework: springboot
+          type: microservice
+          app: demo-ms-four
+      spec:
+        containers:
+          - name: demo-ms-four-container
+            image: docker.io/sriramponangi/logging-tracing.demo-ms-four:latest
+            imagePullPolicy: Always
+            ports:
+            - containerPort: 8084
+            env:
+            - name: CLIENT_BASEURL_DEMOMSTHREE
+              value: http://demo-ms-three:8083/three
+            - name: JAEGER_COLLECTOR_URL
+              value: http://jaeger-collector.istio-system:4317/api/traces
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+    replicas: 1
+    selector:
+      matchLabels:
+        project: log-tracing-demo
+        framework: springboot
+        type: microservice
+        app: demo-ms-four
+
+
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: demo-ms-four
+    namespace: service-mesh-demo
+    labels:
+      project: log-tracing-demo
+      framework: springboot
+      type: microservice
+      app: demo-ms-four
+  spec:
+    type: ClusterIP
+    ports:
+      - name: demo-ms-four-api-http
+        port: 8084
+    selector:
+      project: log-tracing-demo
+      framework: springboot
+      type: microservice
+      app: demo-ms-four
+
+############################################################################
+
