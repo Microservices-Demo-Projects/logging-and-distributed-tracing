@@ -32,4 +32,4 @@ client:
 otel:
   collector:
     # This is gRPC protocol endpoint for OTEL Collector
-    url: http://localhost:4317/api/traces
+    url: ${JAEGER_COLLECTOR_URL:http://localhost:4317/api/traces}
