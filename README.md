@@ -337,18 +337,18 @@ This is a proof of concept project demonstrating logging of traceIds and spanIds
         sriramponangi/logging-tracing.demo-ms-four:latest
       ```
 
-## To Do: Kubernetes (ServiceMesh) Manifest Yaml
-The following configuration can be used to deployed this demo project into an OpenShift servicemesh:
-![Kubernetes Manifest YAML](https://github.com/Microservices-Demo-Projects/logging-and-distributed-tracing/blob/main/kubernetes-manifest.yaml)
+## Kubernetes (ServiceMesh) Manifest Yaml
+- The following configuration YAML can be used to deploy this demo project into an OpenShift servicemesh **[Kubernetes Manifest YAML](https://github.com/Microservices-Demo-Projects/logging-and-distributed-tracing/blob/main/kubernetes-manifest.yaml)**
 
-> Using the following command a load of 100 API requests to `/four/quote` is generated from inside the demo-ms-four pod:
-```shell
-n=0; while [[ $n -lt 100 ]]; do sleep 3 && date && echo -e "Execution $n" \
-&& curl -X GET http://demo-ms-four:8084/four/quote ; n=$((n+1)); done
-```
+- Using the following command a load of 100 API requests to `/four/quote` is generated from inside the demo-ms-four pod:
+  ```shell
+	n=0; while [[ $n -lt 100 ]]; do sleep 3 && date && echo -e "Execution $n" \
+	&& curl -X GET http://demo-ms-four:8084/four/quote ; n=$((n+1)); done
+  ```
 
 ### Openshift ServiceMesh Deployment Results:
-By deploying this Kubernetes manifest yaml of the four demo microservice applications we can see the following results:
+By deploying this **[Kubernetes Manifest YAML](https://github.com/Microservices-Demo-Projects/logging-and-distributed-tracing/blob/main/kubernetes-manifest.yaml)**
+of the four demo microservice applications we can see the following results:
 
 #### Deployments created in OpenShift for the four demo microservices
 ![Deployments Created Screenshot](https://github.com/Microservices-Demo-Projects/logging-and-distributed-tracing/blob/notes/Notes/Results/1-OpenShift-Deployments.png)
