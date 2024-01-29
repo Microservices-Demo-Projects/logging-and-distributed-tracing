@@ -337,18 +337,33 @@ This is a proof of concept project demonstrating logging of traceIds and spanIds
         sriramponangi/logging-tracing.demo-ms-four:latest
       ```
 
-## To Do: Docker Compose Yaml
-...
-
 ## To Do: Kubernetes (ServiceMesh) Manifest Yaml
+The following configuration can be used to deployed this demo project into an OpenShift servicemesh:
+![Kubernetes Manifest YAML](https://github.com/Microservices-Demo-Projects/logging-and-distributed-tracing/blob/main/kubernetes-manifest.yaml)
 
-> Using the following command we will generate API request load to /four/quote
+> Using the following command a load of 100 API requests to `/four/quote` is generated from inside the demo-ms-four pod:
 ```shell
 n=0; while [[ $n -lt 100 ]]; do sleep 3 && date && echo -e "Execution $n" \
 && curl -X GET http://demo-ms-four:8084/four/quote ; n=$((n+1)); done
 ```
-...
 
+### Openshift ServiceMesh Deployment Results:
+By deploying this Kubernetes manifest yaml of the four demo microservice applications we can see the following results:
+
+#### Deployments created in OpenShift for the four demo microservices
+![Deployments Created Screenshot](https://github.com/Microservices-Demo-Projects/logging-and-distributed-tracing/blob/notes/Notes/Results/1-OpenShift-Deployments.png)
+
+#### Pods created in OpenShift for the four demo microservices
+![Deployments Created Screenshot](https://github.com/Microservices-Demo-Projects/logging-and-distributed-tracing/blob/notes/Notes/Results/2-OpenShift-Pods.png)
+
+#### Kiali workload graph in OpenShift - ServiceMesh
+![Kiali Workload Graph Screenshot](https://github.com/Microservices-Demo-Projects/logging-and-distributed-tracing/blob/notes/Notes/Results/3-Kiali-Workload-Graph.png)
+
+#### List of Registered traces in Jaeger
+![Jaeger List of Traces Screenshot](https://github.com/Microservices-Demo-Projects/logging-and-distributed-tracing/blob/notes/Notes/Results/4-Jager-Overall-ms-4-traces.png)
+
+#### Trace Details for the four demo microservices in Jaeger
+![Jaeger List of Traces Screenshot](https://github.com/Microservices-Demo-Projects/logging-and-distributed-tracing/blob/notes/Notes/Results/5-Jager-Detailed-ms-4-traces.png)
 
 # CI/CD with GitHub Actions
 - The demo applications can also be built and their container image can be pushed into DockerHub using the CI pipelines/workflows created using GitHub Actions:
